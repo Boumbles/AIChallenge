@@ -30,10 +30,16 @@ struct my_ant {
     int id;
     int row;
     int col;
+	
 	int prevrow;
 	int prevcol;
     int movecounter;
-
+	int destrow;
+	int destcol;
+	char destobject;
+	char currdirection;
+	int currdestination;
+	char *directions;
 };
 
 struct food {
@@ -41,11 +47,19 @@ struct food {
     int col;
 };
 
+struct hill {
+    int row;
+    int col;
+    char player;
+};
+
 struct game_state {
     struct my_ant *my_ants;
     struct basic_ant *enemy_ants;
     struct food *food;
     struct basic_ant *dead_ants;
+    int debugging;
+    struct hill *hill;
     
     int my_count;
     int enemy_count;
@@ -54,5 +68,7 @@ struct game_state {
 
 	FILE *logfile;
 	
+    int hill_count;
+
     int my_ant_index;
 };

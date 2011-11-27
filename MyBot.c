@@ -36,14 +36,14 @@ int distance(int row1, int col1, int row2, int col2, struct game_info *Info) {
 
 void move(int index, char dir, struct game_state* Game, struct game_info* Info) {
     fprintf(stdout, "O %i %i %c\n", Game->my_ants[index].row, Game->my_ants[index].col, dir);
-    // setpreviouspos( &Game->my_ants[index],
+    // setispreviousposition( &Game->my_ants[index],
                     // Game->my_ants[index].row, 
                     // Game->my_ants[index].col);
     OpenLog(Game);                
     fprintf(Game->logfile, "move() for Index %d in direction %c\n", index, dir); 
     // Game->my_ants[index].prevrow = Game->my_ants[index].row;
     // Game->my_ants[index].prevcol = Game->my_ants[index].col;
-    //fprintf(Game->logfile, "PREVIOUS POS IS %i %i for i= %i Prior to the move\n", Game->my_ants[index].prevrow, Game->my_ants[index].prevcol, index);
+    fprintf(Game->logfile, "PREVIOUS POS IS %i %i for i= %i Prior to the move\n", Game->my_ants[index].prevrow, Game->my_ants[index].prevcol, index);
     
     switch (dir) {
         case 'N':
@@ -110,12 +110,15 @@ int main(int argc, char *argv[]) {
 
     struct game_info Info;
     struct game_state Game;
+    
     Info.map = 0;
     
     Game.my_ants = 0;
     Game.enemy_ants = 0;
     Game.food = 0;
     Game.dead_ants = 0;
+    Game.debugging = 1;
+    Game.hill = 0;
 
     while (42) {
         int initial_buffer = 100000;
@@ -170,17 +173,15 @@ int main(int argc, char *argv[]) {
             char *skip_line = data + 1;
             while (*++skip_line != '\n');
             ++skip_line;
-
+            //StartLog(&Game);
             _init_map(skip_line, &Info);
             _init_game(&Info, &Game);
             do_turn(&Game, &Info);
             fprintf(stdout, "go\n");
-            fflush(stdout);
-            //StartLog();
+            fflush(stdout);            
         }
         else if (action == 1) {
-            _init_ants(data + 1, &Info);
-            //StartLog();
+            _init_ants(data + 1, &Info);            
             Game.my_ant_index = -1;
 
             fprintf(stdout, "go\n");

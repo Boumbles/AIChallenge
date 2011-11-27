@@ -7,124 +7,51 @@
 // To see all the information contained in struct game_state and
 // struct game_info check ants.h. There is also a distance function
 // provided in bot.c
-void updateprevious(struct game_state *Game, struct game_info *Info, int index){
-	OpenLog(Game);
-	fprintf(Game->logfile, "updateprevious()");
-	Game->my_ants[index].prevrow = Game->my_ants[index].row;
-	Game->my_ants[index].prevcol = Game->my_ants[index].col;
-	CloseLog(Game);
-}
+// void updateprevious(struct game_state *Game, struct game_info *Info, int index) {
+	// OpenLog(Game);
+	// fprintf(Game->logfile, "updateprevious()\n");
+    // fprintf(Game->logfile, "index %d \n old prevrow %d old prevcol %d \n", index, Game->my_ants[index].prevrow, Game->my_ants[index].prevcol);
+	// Game->my_ants[index].prevrow = Game->my_ants[index].row;
+	// Game->my_ants[index].prevcol = Game->my_ants[index].col;
+    // fprintf(Game->logfile, "new prevrow %d new prevcol %d \n", Game->my_ants[index].prevrow, Game->my_ants[index].prevcol);
+	// CloseLog(Game);
+// }
 
 void do_turn(struct game_state *Game, struct game_info *Info) {
     int i,j;
 	OpenLog(Game);
     fprintf(Game->logfile, "\nCount is : %d\n", Game->my_count);
-	if(Info->map){
+/* 	if(Info->map){
 		fprintf(Game->logfile, "Size of map is %d\n", strlen(Info->map));
 		for (j = 0; j < strlen(Info->map); ++j){
 			fprintf(Game->logfile, "Object on the map at %d is a %s\r", j, Info->map[j]);
 		}
-	}
+	} */
 	
 	
     for (i = 0; i < Game->my_count; ++i) {        
         // the location within the map array where our ant is currently
         int offset = Game->my_ants[i].row*Info->cols + Game->my_ants[i].col;
-        fprintf(Game->logfile, "\noffset is: %d \n", offset);
+        fprintf(Game->logfile, "\nAnt %d's offset is: %d \n", i, offset);
                 
         char dir = -1;
 		
 		dir = makeaturn(Game, Info, i, offset);
-		if(dir != -1){
-			updateprevious(Game, Info, i);
+		if(dir != -1){            
+			//updateprevious(Game, Info, i);
 			move(i, dir, Game, Info);		
 		}
     }
     CloseLog(Game);
 }
 
-
-
-/*
- * Checks that we are not running into one of our own O(N)
- * */
-int notanant(struct game_state *Game, struct game_info *Info, int origoffset, int destination){
-	int i;
-	OpenLog(Game);
-	fprintf(Game->logfile, "notanant())");
-	for(i = 0; i < Game->my_count; ++i){
-        int compareoffset = Game->my_ants[i].row*Info->cols + Game->my_ants[i].col;
-		fprintf(Game->logfile, "compareoffset = %d ; destination = %d\n", compareoffset, destination);
-        if(origoffset != compareoffset){
-            if(compareoffset == destination){
-                CloseLog(Game);
-				return 0;
-				
-			}
-		}
-		
-	}
-	CloseLog(Game);
-	return 1;
-}
-/*
- * Returns 1 if the and just came from where he wants to go
- * */
-int previouspos(struct game_state *Game, struct game_info *Info, int index, int newpos){
-    OpenLog(Game);
-    fprintf(Game->logfile, "npreviouspos())Checking previous position for index %d :  currentpos %d prepos %d newpos of %d \n", 
-            index,
-            Game->my_ants[index].row*Info->cols + Game->my_ants[index].col,
-            Game->my_ants[index].prevrow*Info->cols + Game->my_ants[index].prevcol,
-            newpos);
-    
-    if((Game->my_ants[index].prevrow*Info->cols + Game->my_ants[index].prevcol) == newpos){
-		fprintf(Game->logfile, "Same place\n");
-        CloseLog(Game);
-        return 1;
-	}
-	fprintf(Game->logfile, "Different locations\n");
-    CloseLog(Game);
-    return 0;
-}
-/*
- * This function decrements our direction counter and forces a direction change if hte ant has been going in the same direction too long
- * */
-int handlecounterandchangedirectionifnecessary(struct game_state *Game, struct game_info *Info, int index){
- Game->my_ants[index].movecounter--;
- if(Game->my_ants[index].movecounter==0){
-  Game->my_ants[index].movecounter = 5;
-  return -1;
- } 
- return 0;
-}
-/*
- * This function validates a potential direction to go in
- * */
-int validateturn(struct game_state *Game, struct game_info *Info, int index, int offset, char obj, int directionasnumber, char direction){
-    OpenLog(Game);
-    fprintf(Game->logfile, "\nvalidate turn offset %d directionasnumber %d index %d \n", offset, directionasnumber, index);
-    fprintf(Game->logfile, "the object is a %c \n", obj);
-    CloseLog(Game);
-	if(obj != '%' &&
-		((obj == '.' && (notanant(Game, Info, offset, directionasnumber) == 1)) ||//(isalpha(obj)==0)) ||
-			obj == '*') &&
-		previouspos(Game, Info, index, directionasnumber) == 0){
-        OpenLog(Game);
-        fprintf(Game->logfile, "direction %c \n", direction);
-        CloseLog(Game);
-		return direction;
-    }
-    OpenLog(Game);
-	fprintf(Game->logfile, "direction %d \n", -1);
-    CloseLog(Game);
-	return -1;
-}
-/*
+/**
  * I took the original turn decision logic and moved it here just to keep things neat and tidy. 
  * */
 char makeaturn(struct game_state *Game, struct game_info *Info, int index, int offset){
-        
+        OpenLog(Game);
+        fprintf(Game->logfile, "makeaturn()\n");
+        CloseLog(Game);
 		// defining things just so we can do less writing
 		// UP and DOWN move up and down rows while LEFT and RIGHT
 		// move side to side. The map is just one big array.
@@ -189,34 +116,176 @@ char makeaturn(struct game_state *Game, struct game_info *Info, int index, int o
 		int directionasnumber[] = { posnorth, poseast, possouth, poswest };
 		char directions[] = {'N', 'E', 'S', 'W' };
 		int i;
-		
+		CloseLog(Game);
 		for(i = 0; i < 4 ; ++i){
 		//	if(directions[i] != NULL && objects[i] != NULL  && directionasnumber[i] != NULL ){
 				dir = validateturn( Game, Info, index, offset, objects[i], directionasnumber[i], directions[i] );
-				if(dir != -1) break;			
+                OpenLog(Game);
+                fprintf(Game->logfile,"after validateturn() the dir = %c\n", dir);
+                CloseLog(Game);
+				if(dir != -1){ 
+                    OpenLog(Game);
+                    fprintf(Game->logfile,"Found a direction\n");
+                    fprintf(Game->logfile," index %d currdirection %s currdestination %d\n", index, directions[i], directionasnumber[i]);
+                    Game->my_ants[index].currdirection = directions[i];
+                    Game->my_ants[index].currdestination = directionasnumber[i];
+                    CloseLog(Game);
+                    break;			
+                }
 		//	}
-		}
-		
+		}    
+    
 	return dir;
 }
+/*
+ * This function validates a potential direction to go in
+ * */
+char validateturn(struct game_state *Game, struct game_info *Info, int index, int offset, char obj, int directionasnumber, char direction){
+    OpenLog(Game);
+    fprintf(Game->logfile, "validateturn()\n offset %d directionasnumber %d index %d \n", offset, directionasnumber, index);
+    fprintf(Game->logfile, "the object is a %c \n", obj);
+    CloseLog(Game);
+    if(obj == '*'){
+        OpenLog(Game);
+        fprintf(Game->logfile, "Found some food\n\n");     
+        Game->my_ants[index].destobject = '*';
+        CloseLog(Game);
+        return direction;
+    }
+	if(obj != '%' &&
+		(obj == '.' && (notanant(Game, Info, offset, directionasnumber) == 1)) //||//(isalpha(obj)==0)) ||
+			//obj == '*') &&
+		//ispreviousposition(Game, Info, index, directionasnumber) == 0)
+        && anotherantmovingtothisspot(Game, directionasnumber) == 0 &&
+        anotherantmovinginthisdirection(Game, index, direction) == 0
+        ){
+        OpenLog(Game);
+        fprintf(Game->logfile, "direction %c \n\n", direction);
+        CloseLog(Game);
+		return direction;
+    }
+    OpenLog(Game);
+	fprintf(Game->logfile, "direction %d \n\n", -1);
+    CloseLog(Game);
+	return -1;
+}
+/*
+ * Returns 1 if the and just came from where he wants to go
+ * */
+int ispreviousposition(struct game_state *Game, struct game_info *Info, int index, int newpos){
+    OpenLog(Game);
+    fprintf(Game->logfile, "ispreviousposition()\nChecking previous position for index %d \n currentpos %d prepos %d newpos of %d \n", 
+            index,
+            Game->my_ants[index].row*Info->cols + Game->my_ants[index].col,
+            Game->my_ants[index].prevrow*Info->cols + Game->my_ants[index].prevcol,
+            newpos);
+    
+    if((Game->my_ants[index].prevrow*Info->cols + Game->my_ants[index].prevcol) == newpos){
+		fprintf(Game->logfile, "Same place\n\n");
+        CloseLog(Game);
+        return 1;
+	}
+	fprintf(Game->logfile, "Different locations\n\n");
+    CloseLog(Game);
+    return 0;
+}
+/**
+ * O(N)
+ */ 
+int anotherantmovingtothisspot(struct game_state *Game, int dir){
+    int i;
+    OpenLog(Game);
+    fprintf(Game->logfile, "anotherantmovingtothisspot()\n position : %d\n", dir);
+    for(i = 0; i < Game->my_count; ++i){
+        fprintf(Game->logfile, "checking %d who's going to %d\n", i, Game->my_ants[i].currdestination);
+        if(Game->my_ants[i].currdestination == dir){
+            fprintf(Game->logfile, "yup\n\n");
+            CloseLog(Game);
+            return 1;
+        }
+    }
+    fprintf(Game->logfile, "nope\n\n");
+    CloseLog(Game);
+    return 0;
+}
+int anotherantmovinginthisdirection(struct game_state *Game, int index, char dir){
+    int i;
+    OpenLog(Game);
+    fprintf(Game->logfile, "anotherantmovinginthisdirection()\n index: %d dir %c\n", index, dir);
+    for(i = 0; i < Game->my_count; ++i){
+        fprintf(Game->logfile, "comparing to %d who's at col %d and row %d and who's moving in %c   \n", 
+                i, 
+                Game->my_ants[i].col,
+                Game->my_ants[i].row,
+                Game->my_ants[i].currdirection);
+        if(Game->my_ants[i].currdirection == dir && 
+            (((dir == 'N' || dir == 'S') && Game->my_ants[i].col == Game->my_ants[index].col) ||
+             ((dir == 'W' || dir == 'E') && Game->my_ants[i].row == Game->my_ants[i].row))
+           ){
+            fprintf(Game->logfile, "yup\n\n");
+            CloseLog(Game);
+            return 1;
+        }
+    }
+    fprintf(Game->logfile, "nope\n\n");
+    CloseLog(Game);
+    return 0;
+}
+
+/*
+ * Checks that we are not running into one of our own O(N)
+ * */
+int notanant(struct game_state *Game, struct game_info *Info, int origoffset, int destination){
+	int i;
+	OpenLog(Game);
+	fprintf(Game->logfile, "notanant())");
+	for(i = 0; i < Game->my_count; ++i){
+        int compareoffset = Game->my_ants[i].row*Info->cols + Game->my_ants[i].col;
+		fprintf(Game->logfile, "compareoffset = %d ; destination = %d\n", compareoffset, destination);
+        if(origoffset != compareoffset){
+            if(compareoffset == destination){
+                CloseLog(Game);
+				return 0;				
+			}
+		}
+		
+	}
+	CloseLog(Game);
+	return 1;
+}
+void setdestination(struct game_state *Game, int index, int dstcol, int dstrow){
+    Game->my_ants[index].destcol = dstcol;
+    Game->my_ants[index].destrow = dstrow;
+}
+
+
+/**
+ *  Debugging 
+ */
 void StartLog(struct game_state *Game){
     //FILE *ofp;
-    char filename[] = "error.log";
-    Game->logfile = fopen(filename, "a");
-    if (Game->logfile == NULL){
-        fprintf(stderr , "Can't open the file %s\n", filename);
+    if(Game->debugging == 1){
+        char filename[] = "error.log";
+        Game->logfile = fopen(filename, "w");
+        if (Game->logfile == NULL){
+            fprintf(stderr , "Can't open the file %s\n", filename);
+        }
+        
+        fprintf(Game->logfile, "Beginning Log File\n");
+        fclose(Game->logfile);
     }
-    
-    fprintf(Game->logfile, "Beginning Log File\n");
-    fclose(Game->logfile);
 }
 void OpenLog(struct game_state *Game){
-    char filename[] = "error.log";
-    Game->logfile = fopen(filename, "a");
-    if (Game->logfile == NULL){
-        fprintf(stderr , "Can't open the file %s\n", filename);
-    }    
+    if(Game->debugging == 1){
+        char filename[] = "error.log";
+        Game->logfile = fopen(filename, "a");
+        if (Game->logfile == NULL){
+            fprintf(stderr , "Can't open the file %s\n", filename);
+        }    
+    }
 }
 void CloseLog(struct game_state *Game){
-    fclose(Game->logfile);
+    if(Game->debugging ==1){
+        fclose(Game->logfile);
+    }
 }
