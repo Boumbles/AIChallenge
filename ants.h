@@ -2,8 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+//#include <ctype.h>
 
 // this header is basically self-documenting
+#define DIFFUSION_FOOD 	500
+#define DIFFUSION_HILL 1000
+#define DIFFUSION_DECREMENT 50
 
 struct game_info {
 	int loadtime;
@@ -16,6 +20,8 @@ struct game_info {
 	int spawnradius_sq;
     int seed;
 	char *map;
+	int *scores;
+	//struct square *squares;
 };
 
 struct basic_ant {
@@ -41,6 +47,9 @@ struct my_ant {
 	int currdestination;
 	char *directions;
 };
+struct square{	
+	int score;
+};
 
 struct food {
     int row;
@@ -53,13 +62,17 @@ struct hill {
     char player;
 };
 
+
 struct game_state {
     struct my_ant *my_ants;
     struct basic_ant *enemy_ants;
     struct food *food;
     struct basic_ant *dead_ants;
+	struct waterspot *waterspots;
+	
     int debugging;
-    struct hill *hill;
+    
+	struct hill *hill;
     
     int my_count;
     int enemy_count;
@@ -72,3 +85,5 @@ struct game_state {
 
     int my_ant_index;
 };
+void spitmap(struct game_info *Info);
+void spitscores(struct game_info *Info);

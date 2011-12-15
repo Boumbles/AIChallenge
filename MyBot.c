@@ -36,15 +36,10 @@ int distance(int row1, int col1, int row2, int col2, struct game_info *Info) {
 
 void move(int index, char dir, struct game_state* Game, struct game_info* Info) {
     fprintf(stdout, "O %i %i %c\n", Game->my_ants[index].row, Game->my_ants[index].col, dir);
-    // setispreviousposition( &Game->my_ants[index],
-                    // Game->my_ants[index].row, 
-                    // Game->my_ants[index].col);
-    OpenLog(Game);                
-    fprintf(Game->logfile, "move() for Index %d in direction %c\n", index, dir); 
-    // Game->my_ants[index].prevrow = Game->my_ants[index].row;
-    // Game->my_ants[index].prevcol = Game->my_ants[index].col;
-    fprintf(Game->logfile, "PREVIOUS POS IS %i %i for i= %i Prior to the move\n", Game->my_ants[index].prevrow, Game->my_ants[index].prevcol, index);
-    
+                 
+    fprintf(stderr, "move() for Index %d in direction %c\n", index, dir); 
+    fprintf(stderr, "PREVIOUS POS IS %i %i for i= %i Prior to the move\n", Game->my_ants[index].prevrow, Game->my_ants[index].prevcol, index);
+    fflush(stderr);
     switch (dir) {
         case 'N':
             if (Game->my_ants[index].row != 0)
@@ -71,13 +66,13 @@ void move(int index, char dir, struct game_state* Game, struct game_info* Info) 
                 Game->my_ants[index].col = Info->cols - 1;
             break;
     }
-    fprintf(Game->logfile, 
+    fprintf(stderr, 
 			"PostMove.Index %d PrevPos : %d and current pos : %d \n", 
 			index, 
 			Game->my_ants[index].prevrow*Info->cols + Game->my_ants[index].prevcol,
 			Game->my_ants[index].row*Info->cols + Game->my_ants[index].col);
-	
-    CloseLog(Game);
+	fflush(stderr);
+    //CloseLog(Game);
 }
 
 // just a function that returns the string on a given line for i/o
@@ -112,6 +107,7 @@ int main(int argc, char *argv[]) {
     struct game_state Game;
     
     Info.map = 0;
+    Info.scores = 0;
     
     Game.my_ants = 0;
     Game.enemy_ants = 0;
@@ -119,8 +115,11 @@ int main(int argc, char *argv[]) {
     Game.dead_ants = 0;
     Game.debugging = 1;
     Game.hill = 0;
-
+	freopen( "stderr.log", "w", stderr );
+	fprintf(stderr, "Starting main function\n");
+	fflush(stderr);
     while (42) {
+		
         int initial_buffer = 100000;
 
         char *data = malloc(initial_buffer);
@@ -153,41 +152,46 @@ int main(int argc, char *argv[]) {
 
                 char *test_cmd = get_line(backup);
 
-                if (strcmp(test_cmd, "go") == 0) {
+                if (strcmp(test_cmd, "go") == 0) {//this means that we are to start moving
+					fprintf(stderr, "Let's start antsing\n");
                     action = 0; 
                     free(test_cmd);
                     break;
                 }
-                else if (strcmp(test_cmd, "ready") == 0) {
-                    action = 1;
+                else if (strcmp(test_cmd, "ready") == 0) { //if we receive this then we are allowed to setup
+					fprintf(stderr, "setup time\n");
+					action = 1;
                     free(test_cmd);
                     break;
                 }
                 free(test_cmd);
             }
-            
+            fflush(stderr);
             ++ins_data;
         }
 
-        if (action == 0) {
+        if (action == 0) {//movement
             char *skip_line = data + 1;
             while (*++skip_line != '\n');
             ++skip_line;
-            //StartLog(&Game);
+			
             _init_map(skip_line, &Info);
+			spitmap(&Info); 
+			spitscores(&Info);
             _init_game(&Info, &Game);
+            
             do_turn(&Game, &Info);
             fprintf(stdout, "go\n");
             fflush(stdout);            
         }
-        else if (action == 1) {
+        else if (action == 1) {//setup
             _init_ants(data + 1, &Info);            
             Game.my_ant_index = -1;
 
             fprintf(stdout, "go\n");
             fflush(stdout);
         }
-
+		fflush(stderr);
         free(data);
     }
 }
