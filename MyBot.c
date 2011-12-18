@@ -39,7 +39,7 @@ void move(int index, char dir, struct game_state* Game, struct game_info* Info) 
                  
    // fprintf(stderr, "move() for Index %d in direction %c\n", index, dir); 
     //fprintf(stderr, "PREVIOUS POS IS %i %i for i= %i Prior to the move\n", Game->my_ants[index].prevrow, Game->my_ants[index].prevcol, index);
-    fflush(stderr);
+    //fflush(stderr);
     switch (dir) {
         case 'N':
             if (Game->my_ants[index].row != 0)
@@ -71,8 +71,7 @@ void move(int index, char dir, struct game_state* Game, struct game_info* Info) 
 			// index, 
 			// Game->my_ants[index].prevrow*Info->cols + Game->my_ants[index].prevcol,
 			// Game->my_ants[index].row*Info->cols + Game->my_ants[index].col);
-	// fflush(stderr);
-    //CloseLog(Game);
+	// fflush(stderr);    
 }
 
 // just a function that returns the string on a given line for i/o
@@ -155,14 +154,12 @@ int main(int argc, char *argv[]) {
                     action = 0; 
                     free(test_cmd);
                     break;
-                }
-                else if (strcmp(test_cmd, "ready") == 0) { //if we receive this then we are allowed to setup
+                } else if (strcmp(test_cmd, "ready") == 0) { //if we receive this then we are allowed to setup
 					//fprintf(stderr, "setup time\n");
 					action = 1;
                     free(test_cmd);
                     break;
-                }
-                free(test_cmd);
+                } else if (test_cmd) free(test_cmd);
             }
             //fflush(stderr);
             ++ins_data;
@@ -190,6 +187,6 @@ int main(int argc, char *argv[]) {
             fflush(stdout);
         }
 		//fflush(stderr);
-        free(data);
+        if(data) free(data);
     }
 }

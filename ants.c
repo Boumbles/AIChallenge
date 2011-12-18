@@ -14,9 +14,8 @@ void _init_ants(char *data, struct game_info *game_info) {
     }
 
     while (42) {        
+                
         
-        gettimeofday(&game_info->currtime, NULL);
-        if(timeup(game_info->loadtime, game_info->currtime)) break;
         char *value = data;
 
         while (*++value != ' ');
@@ -233,9 +232,13 @@ void _init_game(struct game_info *game_info, struct game_state *game_state) {
             } 
         }
     }
-	determinediffusionscores(game_info);
-    if (my_old != 0)
+     if (my_old && my_old != 0)
         free(my_old);
+
+	determinediffusionscores(game_info);
+    fprintf(stderr, "diffusions deteremined\n");
+    fflush(stderr);
+	
 }
 
 // Updates the map.
@@ -254,10 +257,11 @@ void _init_game(struct game_info *game_info, struct game_state *game_state) {
 
 void _init_map(char *data, struct game_info *game_info) {
 	// fprintf(stderr, "game_info->map: %s\n", game_info->map);
+    gettimeofday(&game_info->turnstart, NULL);
     if (game_info->map == 0) {
         game_info->map = malloc(game_info->rows*game_info->cols);
         memset(game_info->map, '.', game_info->rows*game_info->cols);
-        //fprintf(stderr, "allocated map\n");
+        fprintf(stderr, "allocated map\n");
 		//fflush(stderr);
     } 
     // fprintf(stderr, "game_info->scores : %d\n", game_info->scores);
@@ -265,8 +269,8 @@ void _init_map(char *data, struct game_info *game_info) {
 	if (game_info->scores == 0 ){
 		game_info->scores = malloc(game_info->rows*game_info->cols * sizeof(*game_info->scores));
 		memset(game_info->scores, -1, game_info->rows*game_info->cols*sizeof(int));
-		//fprintf(stderr, "allocated scores\n");
-		//fflush(stderr);
+		fprintf(stderr, "allocated scores\n");
+		fflush(stderr);
 	}
 	
 	// fprintf(stderr, "Memory allocated. size of map : %d, size of scores : %d\n", 

@@ -9,11 +9,11 @@
 // provided in bot.c
 
 void do_turn(struct game_state *Game, struct game_info *Info) {
-    gettimeofday(&Info->currtime, NULL);
+    //gettimeofday(&Info->currtime, NULL);
     
     int i,j;	
     for (i = 0; i < Game->my_count; ++i) {    
-        if(timeup(Info->turntime, Info->currtime)) break;
+        if(timeup(Info->turntime, Info->turnstart) == 1) break;
             
         // the location within the map array where our ant is currently
         int offset = Game->my_ants[i].row*Info->cols + Game->my_ants[i].col;
@@ -88,7 +88,8 @@ char makeaturn(struct game_state *Game, struct game_info *Info, int index, int o
     tmpdiroffset = getbestdirection(Info, posnorth, poseast, possouth, poswest);
     //if(Info->scores[index])
     Info->scores[offset] -= DIFFUSION_DECREMENT;
-	
+	fprintf(stderr, "bestoffset %d\n", tmpdiroffset);
+    fflush(stderr);
     //lowerdiffusionscore(Info, tmpdiroffset);
     
     if(tmpdiroffset == posnorth) dir = 'N';
@@ -102,15 +103,15 @@ char makeaturn(struct game_state *Game, struct game_info *Info, int index, int o
         Info->scores[tmpdiroffset] = 0;
     else 
         Info->scores[offset] = 0;
-    fflush(stderr);
+    //fflush(stderr);
 	return dir;
 }
-char determinediffusionscores(struct game_info *Info){
+void determinediffusionscores(struct game_info *Info){
 	int i;
 	int j;
 	fflush(stderr);
 	for(i = 0; i < Info->rows; ++i){
-        if(timeup(Info->turntime, Info->currtime)) break;        
+        if(timeup(Info->turntime, Info->turnstart) == 1) break;        
         for(j = 0; j < Info->cols; ++j){
            int offset = i*Info->cols + j;
 			char obj = Info->map[j];
@@ -118,11 +119,11 @@ char determinediffusionscores(struct game_info *Info){
                 setgetdiffusionscore(Info, i, j);	
 		}
 	}
-	return -1;
+	return;
 }
 
-int setgetdiffusionscore(struct game_info *Info, int r, int c){
-    if(timeup(Info->turntime, Info->currtime)) return -1;
+void setgetdiffusionscore(struct game_info *Info, int r, int c){
+    if(timeup(Info->turntime, Info->turnstart) == 1) return;
         
     #define UP -Info->cols
     #define DOWN Info->cols
@@ -161,11 +162,11 @@ int setgetdiffusionscore(struct game_info *Info, int r, int c){
 		Info->scores[offset] = DIFFUSION_EXPLORE;
 	}
 	
- 	return Info->scores[offset];
+ 	//return Info->scores[offset];
 }
 
 void setsurroundingsquares(struct game_info *Info, int r, int c, int squarescore, int radius){
-    if(timeup(Info->turntime, Info->currtime)) return;
+    if(timeup(Info->turntime, Info->turnstart) == 1) return;
         
 	char obj_north, obj_east, obj_south, obj_west;		
     int posnorth, poseast, possouth, poswest;
@@ -188,7 +189,7 @@ void setsurroundingsquares(struct game_info *Info, int r, int c, int squarescore
 void setanadjacentsquaresscore(struct game_info *Info, int centerrow, int centercol, 
                                int row, int col, int score, char dir, int radius){
     //gettimeofday(&Info->currtime, NULL);
-    if(timeup(Info->turntime, Info->currtime)) return;
+    if(timeup(Info->turntime, Info->turnstart) == 1) return;
     
     int rowcoloffset = row*Info->cols + col;
     int centeroffset = centerrow*Info->cols + centercol;
@@ -239,10 +240,10 @@ int getbestdirection(struct game_info *Info, int posnorth, int poseast, int poss
     //fflush(stderr);
     int northdiff, eastdiff, southdiff, westdiff;
     int highest;
-    northdiff = getdiffusionscore(Info, posnorth);
-    eastdiff = getdiffusionscore(Info, poseast);
-    southdiff = getdiffusionscore(Info, possouth);
-    westdiff = getdiffusionscore(Info, poswest);
+    northdiff = Info->scores[posnorth];
+    eastdiff = Info->scores[poseast];
+    southdiff = Info->scores[possouth];
+    westdiff = Info->scores[poswest];
 	
 	
     highest =  northdiff > eastdiff ? northdiff : eastdiff;
@@ -256,15 +257,16 @@ int getbestdirection(struct game_info *Info, int posnorth, int poseast, int poss
     else if (highest ==  eastdiff) return poseast;
     else if (highest ==  southdiff) return possouth;
     else if (highest ==  westdiff) return poswest;
-    
+    fprintf(stderr, "no best\n");
+    fflush(stderr);
     return -1;
 }
 
-int getdiffusionscore(struct game_info *Info, int index){
+/* int getdiffusionscore(struct game_info *Info, int index){
     if(Info->scores[index] >= 0)
         return Info->scores[index];
     return - 1;
-}
+} */
 void lowerdiffusionscore(struct game_info *Info, int index){
 	//fprintf(stderr, "\nlowering diffusion of %d \n", index);
     if(Info->scores[index])
@@ -315,5 +317,6 @@ int timeup(int maxtime, struct timeval start){
         fflush(stderr);
         return 1;
     }
+    
     return 0;
 }
