@@ -2,12 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
+#include <sys/time.h>
 //#include <ctype.h>
 
 // this header is basically self-documenting
-#define DIFFUSION_FOOD 	500
-#define DIFFUSION_HILL 1000
-#define DIFFUSION_DECREMENT 50
+#define DIFFUSION_WATER -50000
+#define DIFFUSION_FOOD 	2000
+#define DIFFUSION_HILL 1500
+#define DIFFUSION_EXPLORE 250
+#define DIFFUSION_ANT_AVOID -100
+#define DIFFUSION_DECREMENT 100
+#define DIFFUSION_MAX_DISTANCE_NOM 5
+#define DIFFUSION_MAX_DISTANCE_HILL 7
+#define DIFFUSION_MAX_DISTANCE_ANT 3
 
 struct game_info {
 	int loadtime;
@@ -21,6 +29,9 @@ struct game_info {
     int seed;
 	char *map;
 	int *scores;
+	struct timeval setupstart;
+	struct timeval turnstart;
+	struct timeval currtime;
 	//struct square *squares;
 };
 

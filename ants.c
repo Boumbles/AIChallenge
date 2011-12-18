@@ -4,6 +4,7 @@
 // function is not called after the game has started
 
 void _init_ants(char *data, struct game_info *game_info) {
+    gettimeofday(&game_info->setupstart, NULL);
     char *replace_data = data;
     
     while (*replace_data != '\0') {
@@ -12,7 +13,10 @@ void _init_ants(char *data, struct game_info *game_info) {
         ++replace_data;
     }
 
-    while (42) {
+    while (42) {        
+        
+        gettimeofday(&game_info->currtime, NULL);
+        if(timeup(game_info->loadtime, game_info->currtime)) break;
         char *value = data;
 
         while (*++value != ' ');
@@ -249,26 +253,26 @@ void _init_game(struct game_info *game_info, struct game_state *game_state) {
 
 
 void _init_map(char *data, struct game_info *game_info) {
-	fprintf(stderr, "game_info->map: %s\n", game_info->map);
+	// fprintf(stderr, "game_info->map: %s\n", game_info->map);
     if (game_info->map == 0) {
         game_info->map = malloc(game_info->rows*game_info->cols);
         memset(game_info->map, '.', game_info->rows*game_info->cols);
-        fprintf(stderr, "allocated map\n");
-		fflush(stderr);
+        //fprintf(stderr, "allocated map\n");
+		//fflush(stderr);
     } 
-    fprintf(stderr, "game_info->scores : %d\n", game_info->scores);
-    fflush(stderr);
+    // fprintf(stderr, "game_info->scores : %d\n", game_info->scores);
+    //fflush(stderr);
 	if (game_info->scores == 0 ){
 		game_info->scores = malloc(game_info->rows*game_info->cols * sizeof(*game_info->scores));
 		memset(game_info->scores, -1, game_info->rows*game_info->cols*sizeof(int));
-		fprintf(stderr, "allocated scores\n");
-		fflush(stderr);
+		//fprintf(stderr, "allocated scores\n");
+		//fflush(stderr);
 	}
 	
-	fprintf(stderr, "Memory allocated. size of map : %d, size of scores : %d\n", 
-			sizeof(game_info->map)/sizeof(char), sizeof(game_info->scores)/sizeof(int));
-	fprintf(stderr, "rows : %d , columns : %d\n", game_info->rows, game_info->cols);
-	fflush(stderr);
+	// fprintf(stderr, "Memory allocated. size of map : %d, size of scores : %d\n", 
+			// sizeof(game_info->map)/sizeof(char), sizeof(game_info->scores)/sizeof(int));
+	//fprintf(stderr, "rows : %d , columns : %d\n", game_info->rows, game_info->cols);
+	//fflush(stderr);
     int map_len = game_info->rows*game_info->cols;
     int i = 0;
 
@@ -330,7 +334,7 @@ void _init_map(char *data, struct game_info *game_info) {
                 break;
             case 'h':
                 game_info->map[offset] = var3;
-				game_info->scores[offset] = DIFFUSION_HILL;
+				//game_info->scores[offset] = DIFFUSION_HILL;
                 break;
             default: 
 				game_info->map[offset] = '.';
@@ -340,8 +344,8 @@ void _init_map(char *data, struct game_info *game_info) {
 		// fflush(stderr);
         data = tmp_ptr + 1;
     }
-	fprintf(stderr, "Done setting up map\n");
-	fflush(stderr);
+	//fprintf(stderr, "Done setting up map\n");
+	//fflush(stderr);
 	  
 }
 void spitmap(struct game_info *Info){
@@ -351,6 +355,8 @@ void spitmap(struct game_info *Info){
 	fprintf(stderr, "rows %d columns %d\n", Info->rows, Info->cols);
 	fflush(stderr);
 	for(i = 0; i < Info->rows; ++i){
+        fprintf(stderr, "%d:", i);
+        fflush(stderr);
 		for(j = 0; j < Info->cols; ++j){
 			int index = i*Info->cols + j;
 			// fprintf(stderr, "index: %d ", index);
@@ -374,12 +380,14 @@ void spitscores(struct game_info *Info){
 	fprintf(stderr, "rows %d columns %d\n", Info->rows, Info->cols);
 	fflush(stderr);
 	for(i = 0; i < Info->rows; ++i){
+        fprintf(stderr, "%d:", i);
+        fflush(stderr);		
 		for(j = 0; j < Info->cols; ++j){
 			int index = i*Info->cols + j;
 			// fprintf(stderr, "index: %d ", index);
 			// fflush(stderr);
 			
-			fprintf(stderr, "%d",Info->scores[index]);
+			fprintf(stderr, "%d,",Info->scores[index]);
 			fflush(stderr);
 			++rowcount;
 			if(rowcount >= Info->cols){

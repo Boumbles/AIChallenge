@@ -10,35 +10,35 @@ int abs(int x) {
 
 // returns the distance between two items on the grid accounting for map wrapping
 
-int distance(int row1, int col1, int row2, int col2, struct game_info *Info) {
-    int dr, dc;
-    int abs1, abs2;
+// int distance(int row1, int col1, int row2, int col2, struct game_info *Info) {
+    // int dr, dc;
+    // int abs1, abs2;
 
-    abs1 = abs(row1 - row2);
-    abs2 = Info->rows - abs(row1 - row2);
+    // abs1 = abs(row1 - row2);
+    // abs2 = Info->rows - abs(row1 - row2);
 
-    if (abs1 > abs2)
-        dr = abs2;
-    else
-        dr = abs1;
+    // if (abs1 > abs2)
+        // dr = abs2;
+    // else
+        // dr = abs1;
 
-    abs1 = abs(col1 - col2);
-    abs2 = Info->cols - abs(col1 - col2);
+    // abs1 = abs(col1 - col2);
+    // abs2 = Info->cols - abs(col1 - col2);
 
-    if (abs1 > abs2)
-        dc = abs2;
-    else
-        dc = abs1;
+    // if (abs1 > abs2)
+        // dc = abs2;
+    // else
+        // dc = abs1;
 
-    return sqrt(pow(dr, 2) + pow(dc, 2));
-}
+    // return sqrt(pow(dr, 2) + pow(dc, 2));
+// }
 // sends a move to the tournament engine and keeps track of ants new location
 
 void move(int index, char dir, struct game_state* Game, struct game_info* Info) {
     fprintf(stdout, "O %i %i %c\n", Game->my_ants[index].row, Game->my_ants[index].col, dir);
                  
-    fprintf(stderr, "move() for Index %d in direction %c\n", index, dir); 
-    fprintf(stderr, "PREVIOUS POS IS %i %i for i= %i Prior to the move\n", Game->my_ants[index].prevrow, Game->my_ants[index].prevcol, index);
+   // fprintf(stderr, "move() for Index %d in direction %c\n", index, dir); 
+    //fprintf(stderr, "PREVIOUS POS IS %i %i for i= %i Prior to the move\n", Game->my_ants[index].prevrow, Game->my_ants[index].prevcol, index);
     fflush(stderr);
     switch (dir) {
         case 'N':
@@ -66,12 +66,12 @@ void move(int index, char dir, struct game_state* Game, struct game_info* Info) 
                 Game->my_ants[index].col = Info->cols - 1;
             break;
     }
-    fprintf(stderr, 
-			"PostMove.Index %d PrevPos : %d and current pos : %d \n", 
-			index, 
-			Game->my_ants[index].prevrow*Info->cols + Game->my_ants[index].prevcol,
-			Game->my_ants[index].row*Info->cols + Game->my_ants[index].col);
-	fflush(stderr);
+    // fprintf(stderr, 
+			// "PostMove.Index %d PrevPos : %d and current pos : %d \n", 
+			// index, 
+			// Game->my_ants[index].prevrow*Info->cols + Game->my_ants[index].prevcol,
+			// Game->my_ants[index].row*Info->cols + Game->my_ants[index].col);
+	// fflush(stderr);
     //CloseLog(Game);
 }
 
@@ -115,10 +115,8 @@ int main(int argc, char *argv[]) {
     Game.dead_ants = 0;
     Game.debugging = 1;
     Game.hill = 0;
-	freopen( "stderr.log", "w", stderr );
-	fprintf(stderr, "Starting main function\n");
-	fflush(stderr);
-    while (42) {
+	//freopen( "stderr.log", "w", stderr );
+	while (42) {
 		
         int initial_buffer = 100000;
 
@@ -153,20 +151,20 @@ int main(int argc, char *argv[]) {
                 char *test_cmd = get_line(backup);
 
                 if (strcmp(test_cmd, "go") == 0) {//this means that we are to start moving
-					fprintf(stderr, "Let's start antsing\n");
+					//fprintf(stderr, "Let's start antsing\n");
                     action = 0; 
                     free(test_cmd);
                     break;
                 }
                 else if (strcmp(test_cmd, "ready") == 0) { //if we receive this then we are allowed to setup
-					fprintf(stderr, "setup time\n");
+					//fprintf(stderr, "setup time\n");
 					action = 1;
                     free(test_cmd);
                     break;
                 }
                 free(test_cmd);
             }
-            fflush(stderr);
+            //fflush(stderr);
             ++ins_data;
         }
 
@@ -176,8 +174,8 @@ int main(int argc, char *argv[]) {
             ++skip_line;
 			
             _init_map(skip_line, &Info);
-			spitmap(&Info); 
-			spitscores(&Info);
+			//spitmap(&Info); 
+			//spitscores(&Info);
             _init_game(&Info, &Game);
             
             do_turn(&Game, &Info);
@@ -191,7 +189,7 @@ int main(int argc, char *argv[]) {
             fprintf(stdout, "go\n");
             fflush(stdout);
         }
-		fflush(stderr);
+		//fflush(stderr);
         free(data);
     }
 }
