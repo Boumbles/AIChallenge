@@ -1,3 +1,5 @@
-A C starter pack created by flagcapper. If given any unexpected input, it will crash. Compile using the makefile or with:
+Submission to the Google AI Challenge Based on the C starter pack created by flagcapper. 
 
-gcc *.c -o MyBot -lm
+Implements collaborative diffusion as a path finding strategy. 
+
+Compile using the Makefile and test with the AIchallenge test bot.
